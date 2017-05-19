@@ -6,5 +6,5 @@ Gem::Specification.new do |spec|
   spec.files = Dir.glob("lib/**/*.rb")
 
   spec.add_dependency 'elasticsearch'
-
+  spec.add_dependency 'active_model'
 end

@@ -1,1 +1,5 @@
-puts 'they suck'
+require 'elasticsearch'
+
+require_relative './elasticsearch/model'
+require_relative './elasticsearch/model_proxy'
+require_relative './elasticsearch/results'
