@@ -11,13 +11,32 @@ class Elasticsearch::Results
     @response["hits"]["total"]
   end
 
-  def results
+  def preload_with scope = nil, &block
+    if block_given?
+      @preload_block = block
+    else
+      @preload_block = proc{ send(scope) }
+    end
+    self
+  end
+
+  def record_hash
+    return @record_hash if @record_hash
     result_ids = @response["hits"]["hits"].map{|x| x["_id"].to_i}
-    record_hash = @model.where(id: result_ids).map{|x| [x.id, x]}.to_h
-    result_ids.map{|x| record_hash[x]}.compact
+    relation = @model.where(id: result_ids)
+    relation = relation.instance_eval(&@preload_block) if @preload_block
+    @record_hash = relation.map{|x| [x.id, x]}.to_h
+  end
+
+  def records
+    @records ||= @response["hits"]["hits"].map{|x| x["_id"].to_i}.map{|x| record_hash[x]}.compact
   end
 
   def hits
-    @response["hits"]["hits"].map{|x| (@options[:hit_class] || Elasticsearch::Results::Hit).new(x)}
+    @hits ||= @response["hits"]["hits"].map{|x| Elasticsearch::Hit.new(x, record_hash[x["_id"].to_i])}
+  end
+
+  def aggregations
+    @response["aggregations"]
   end
 end

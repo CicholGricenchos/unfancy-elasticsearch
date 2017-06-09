@@ -1,5 +1,9 @@
-class Elasticsearch::Results::Hit
-  def initialize data
-    @data = data
+class Elasticsearch::Hit
+  attr_reader :record
+
+  def initialize response, record
+    @response = response
+    @record = record
   end
+
 end

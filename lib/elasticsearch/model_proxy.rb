@@ -100,4 +100,8 @@ class Elasticsearch::ModelProxy
   def get_record id
     client.get index: @alias_name, type: @type_name, id: id
   end
+
+  def refresh
+    client.indices.refresh index: @alias_name
+  end
 end
